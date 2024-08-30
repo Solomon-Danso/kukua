@@ -161,12 +161,6 @@ function displayHistory() {
     const historyList = document.getElementById('history');
     historyList.innerHTML = '';
 
-    // Sort history by the order in which it was saved (latest first)
-    history.sort((a, b) => {
-        // Assuming the history array is in the correct order when saved
-        return history.indexOf(b) - history.indexOf(a);
-    });
-
     history.forEach((entry, index) => {
         const listItem = document.createElement('li');
         listItem.className = 'history-item';
@@ -176,7 +170,6 @@ function displayHistory() {
         historyList.appendChild(listItem);
     });
 }
-
 
 function viewHistory(index) {
     const history = JSON.parse(localStorage.getItem('apiHistory')) || [];
@@ -207,7 +200,7 @@ function deleteHistory(index) {
     const history = JSON.parse(localStorage.getItem('apiHistory')) || [];
     history.splice(index, 1);
     localStorage.setItem('apiHistory', JSON.stringify(history));
-    displayHistory();
+    displayHistory(); // Refresh the history list to reflect changes
 }
 
 // Initial display of history
