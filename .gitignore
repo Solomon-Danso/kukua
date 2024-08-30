@@ -41,6 +41,8 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+Kukua-darwin-x64/
+release-builds/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

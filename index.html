@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KUKUA</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #body-section {
+            display: none;
+        }
+        #body-json {
+            display: none;
+        }
+        .history-item {
+            margin-bottom: 10px;
+        }
+        .history-item button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KUKUA</h1>
+        
+        <div class="api-section">
+            <label for="api-url">API URL:</label>
+            <input type="text" id="api-url" placeholder="Enter API URL">
+            
+            <label for="http-method">HTTP Method:</label>
+            <select id="http-method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
+            </select>
+            
+            <label for="headers">Headers:</label>
+            <div id="headers-section">
+                <div class="form-data-row">
+                    <input type="text" class="key" placeholder="Header Key">
+                    <input type="text" class="value" placeholder="Header Value">
+                    <button class="remove-row">-</button>
+                </div>
+            </div>
+            <button id="add-header">+ Add Header</button>
+            
+            <label for="body-type">Body Type:</label>
+            <select id="body-type">
+                <option value="none">None</option>
+                <option value="json">JSON</option>
+                <option value="form-data">Form Data</option>
+            </select>
+            
+            <div id="body-section">
+                <textarea id="body-json" placeholder="Enter JSON body"></textarea>
+                <!-- Body content will be dynamic based on the selection -->
+            </div>
+            <button id="add-body">+ Add Body Field</button>
+            
+            <button id="send-request">Send Request</button>
+        </div>
+
+        <div id="loading-icon" class="loading-icon" style="display: none;"></div>
+  
+        <div class="response-section">
+            <h2>Response</h2>
+            <pre id="response"></pre>
+        </div>
+        
+        <div class="history-section">
+            <h2>API History</h2>
+            <ul id="history"></ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
