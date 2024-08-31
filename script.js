@@ -44,6 +44,7 @@ function addBodyField() {
     }
 }
 
+// Modified createFormDataRow to include file input
 function createFormDataRow() {
     const row = document.createElement('div');
     row.className = 'form-data-row';
@@ -58,6 +59,19 @@ function createFormDataRow() {
     valueInput.className = 'value';
     valueInput.placeholder = 'Value';
 
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.className = 'file';
+    fileInput.style.display = 'none'; // Hidden by default
+
+    const toggleFileInputButton = document.createElement('button');
+    toggleFileInputButton.textContent = 'Add File';
+    toggleFileInputButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        valueInput.style.display = valueInput.style.display === 'none' ? 'inline-block' : 'none';
+        fileInput.style.display = fileInput.style.display === 'none' ? 'inline-block' : 'none';
+    });
+
     const removeButton = document.createElement('button');
     removeButton.className = 'remove-row';
     removeButton.textContent = '-';
@@ -65,11 +79,37 @@ function createFormDataRow() {
 
     row.appendChild(keyInput);
     row.appendChild(valueInput);
+    row.appendChild(fileInput);
+    row.appendChild(toggleFileInputButton);
     row.appendChild(removeButton);
 
     return row;
 }
 
+// Updated getFormData to include files
+function getFormData(sectionId) {
+    const data = new FormData();
+    const section = document.getElementById(sectionId);
+    const rows = section.getElementsByClassName('form-data-row');
+
+    Array.from(rows).forEach(row => {
+        const key = row.querySelector('.key').value;
+        const value = row.querySelector('.value').value;
+        const fileInput = row.querySelector('.file');
+
+        if (key) {
+            if (fileInput && fileInput.files.length > 0) {
+                data.append(key, fileInput.files[0]); // Append file
+            } else {
+                data.append(key, value); // Append regular text field value
+            }
+        }
+    });
+
+    return data;
+}
+
+// Updated sendRequest to handle FormData correctly
 function sendRequest() {
     const url = document.getElementById('api-url').value;
     const method = document.getElementById('http-method').value.toUpperCase();
@@ -78,7 +118,7 @@ function sendRequest() {
 
     let options = {
         method,
-        headers
+        headers: {}
     };
 
     // Display loading icon
@@ -90,7 +130,7 @@ function sendRequest() {
             if (jsonBody) {
                 try {
                     options.body = JSON.stringify(JSON.parse(jsonBody));
-                    headers['Content-Type'] = 'application/json';
+                    options.headers['Content-Type'] = 'application/json';
                 } catch (error) {
                     alert('Invalid JSON body: ' + error.message);
                     document.getElementById('loading-icon').style.display = 'none';
@@ -98,56 +138,24 @@ function sendRequest() {
                 }
             }
         } else if (bodyType === 'form-data') {
-            const formData = new FormData();
-            const bodyData = getFormData('body-section');
-            for (const key in bodyData) {
-                formData.append(key, bodyData[key]);
-            }
-            options.body = formData;
+            options.body = getFormData('body-section'); // Use FormData
         }
     }
 
     fetch(url, options)
-        .then(response => {
-            const contentType = response.headers.get('Content-Type');
-            if (contentType && contentType.includes('application/json')) {
-                return response.json();
-            } else if (contentType && contentType.includes('text')) {
-                return response.text();
-            } else {
-                return response.blob(); // Handle binary data like images
-            }
-        })
+        .then(response => response.json())
         .then(data => {
-            if (typeof data === 'object') {
-                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-            } else {
-                document.getElementById('response').textContent = data;
-            }
+            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
             saveHistory(url, method, headers, options.body, data);
         })
         .catch(error => {
             document.getElementById('response').textContent = `Error: ${error.message}`;
         })
         .finally(() => {
-            // Hide loading icon
             document.getElementById('loading-icon').style.display = 'none';
         });
 }
 
-function getFormData(sectionId) {
-    const data = {};
-    const section = document.getElementById(sectionId);
-    const rows = section.getElementsByClassName('form-data-row');
-
-    Array.from(rows).forEach(row => {
-        const key = row.querySelector('.key').value;
-        const value = row.querySelector('.value').value;
-        if (key) data[key] = value;
-    });
-
-    return data;
-}
 
 function saveHistory(url, method, headers, body, response) {
     const history = JSON.parse(localStorage.getItem('apiHistory')) || [];
