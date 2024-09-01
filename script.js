@@ -10,7 +10,7 @@ function updateBodySection() {
     const bodyType = document.getElementById('body-type').value;
     const jsonBody = document.getElementById('body-json');
     
-    if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+    if (method === 'POST' || method === 'PUT' || method === 'PATCH' ||method === 'DELETE') {
         bodySection.style.display = 'block';
         
         if (bodyType === 'json') {
@@ -124,7 +124,7 @@ function sendRequest() {
     // Display loading icon
     document.getElementById('loading-icon').style.display = 'block';
 
-    if (method !== 'GET' && method !== 'DELETE') {
+    if (method !== 'GET') {
         if (bodyType === 'json') {
             const jsonBody = document.getElementById('body-json').value.trim();
             if (jsonBody) {
