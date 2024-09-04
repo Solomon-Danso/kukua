@@ -110,15 +110,17 @@ function getFormData(sectionId) {
 }
 
 // Updated sendRequest to handle FormData correctly
+
+
 function sendRequest() {
     const url = document.getElementById('api-url').value;
     const method = document.getElementById('http-method').value.toUpperCase();
-    const headers = getFormData('headers-section');
+    const headers = getHeaders(); // Updated to use getHeaders instead of getFormData
     const bodyType = document.getElementById('body-type').value;
 
     let options = {
         method,
-        headers: {}
+        headers: headers, // Headers are now correctly set as an object
     };
 
     // Display loading icon
@@ -138,7 +140,7 @@ function sendRequest() {
                 }
             }
         } else if (bodyType === 'form-data') {
-            options.body = getFormData('body-section'); // Use FormData
+            options.body = getFormData('body-section'); // Use FormData for form-data type
         }
     }
 
@@ -155,6 +157,32 @@ function sendRequest() {
             document.getElementById('loading-icon').style.display = 'none';
         });
 }
+
+function getHeaders() {
+    const headers = {};
+    const headersSection = document.getElementById('headers-section');
+    const rows = headersSection.getElementsByClassName('form-data-row');
+
+    Array.from(rows).forEach(row => {
+        const key = row.querySelector('.key').value;
+        const value = row.querySelector('.value').value;
+
+        if (key) {
+            headers[key] = value; // Add each header to the headers object
+        }
+    });
+
+    return headers;
+}
+
+
+
+
+
+
+
+
+
 
 
 function saveHistory(url, method, headers, body, response) {
