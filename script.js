@@ -115,12 +115,12 @@ function getFormData(sectionId) {
 function sendRequest() {
     const url = document.getElementById('api-url').value;
     const method = document.getElementById('http-method').value.toUpperCase();
-    const headers = getHeaders(); // Updated to use getHeaders instead of getFormData
+    const headers = getHeaders();
     const bodyType = document.getElementById('body-type').value;
 
     let options = {
         method,
-        headers: headers, // Headers are now correctly set as an object
+        headers: headers,
     };
 
     // Display loading icon
@@ -140,15 +140,31 @@ function sendRequest() {
                 }
             }
         } else if (bodyType === 'form-data') {
-            options.body = getFormData('body-section'); // Use FormData for form-data type
+            options.body = getFormData('body-section');
         }
     }
 
     fetch(url, options)
-        .then(response => response.json())
+        .then(response => {
+            const contentType = response.headers.get('content-type');
+
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else if (contentType && contentType.includes('text/html')) {
+
+                return response.text(); // Return the HTML as a string
+            } else {
+                throw new Error('Unsupported content type: ' + contentType);
+            }
+        })
         .then(data => {
-            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-            saveHistory(url, method, headers, options.body, data);
+            if (typeof data === 'object') {
+                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+                saveHistory(url, method, headers, options.body, data);
+            } else {
+                document.getElementById('response').innerHTML = data; // Insert HTML into 'response' container
+                saveHistory(url, method, headers, options.body, data);
+            }
         })
         .catch(error => {
             document.getElementById('response').textContent = `Error: ${error.message}`;
@@ -157,6 +173,7 @@ function sendRequest() {
             document.getElementById('loading-icon').style.display = 'none';
         });
 }
+
 
 function getHeaders() {
     const headers = {};
@@ -178,19 +195,30 @@ function getHeaders() {
 
 
 
-
-
-
-
-
-
-
 function saveHistory(url, method, headers, body, response) {
     const history = JSON.parse(localStorage.getItem('apiHistory')) || [];
-    history.push({ url, method, headers, body, response });
+    
+    // Determine the body type
+    const bodyType = body instanceof FormData ? 'FormData' : 'JSON';
+    
+    // Convert FormData to a JSON object if it's the body
+    const bodyData = body instanceof FormData ? formDataToObject(body) : body;
+
+    history.push({ url, method, headers, bodyType, body: bodyData, response });
     localStorage.setItem('apiHistory', JSON.stringify(history));
     displayHistory();
 }
+
+
+// Function to convert FormData to a plain object
+function formDataToObject(formData) {
+    const obj = {};
+    formData.forEach((value, key) => {
+        obj[key] = value;
+    });
+    return obj;
+}
+
 
 function displayHistory() {
     const history = JSON.parse(localStorage.getItem('apiHistory')) || [];
