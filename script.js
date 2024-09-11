@@ -236,16 +236,17 @@ function displayHistory() {
 }
 
 function viewHistory(index) {
+
+
     const history = JSON.parse(localStorage.getItem('apiHistory')) || [];
     const entry = history[index];
 
-    // Open a new window and populate with entry data
-    const newWindow = window.open('', '_blank');
-    newWindow.document.write(`
-        <html>
-        <head><title>Request Details</title></head>
-        <body>
-        <h1>Request Details</h1>
+
+    const modal = document.getElementById('modal');
+    const modalBody = document.getElementById('modal-body');
+    
+    modalBody.innerHTML = `
+         <h1>Request Details</h1>
         <p><strong>URL:</strong> ${entry.url}</p>
         <p><strong>Method:</strong> ${entry.method}</p>
         <p><strong>Headers:</strong></p>
@@ -254,11 +255,19 @@ function viewHistory(index) {
         <pre>${entry.body ? JSON.stringify(entry.body, null, 2) : 'No body'}</pre>
         <p><strong>Response:</strong></p>
         <pre>${JSON.stringify(entry.response, null, 2)}</pre>
-        </body>
-        </html>
-    `);
-    newWindow.document.close();
+    `;
+
+    modal.style.display = 'block';
+
 }
+
+
+const span = document.getElementsByClassName('close')[0];
+span.onclick = function() {
+    const modal = document.getElementById('modal');
+    modal.style.display = 'none';
+}
+
 
 function deleteHistory(index) {
     const history = JSON.parse(localStorage.getItem('apiHistory')) || [];
