@@ -145,34 +145,72 @@ function sendRequest() {
     }
 
     fetch(url, options)
-        .then(response => {
-            const contentType = response.headers.get('content-type');
+    .then(response => {
+        const contentType = response.headers.get('content-type');
 
-            if (contentType && contentType.includes('application/json')) {
-                return response.json();
-            } else if (contentType && contentType.includes('text/html')) {
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else if (contentType && contentType.includes('text/html')) {
+            return response.text(); // Return the HTML as a string
+        } else {
+            throw new Error('Unsupported content type: ' + contentType);
+        }
+    })
+    .then(data => {
+        // Clear the response container
+        const responseContainer = document.getElementById('response');
+        responseContainer.innerHTML = ''; // Clear previous response
 
-                return response.text(); // Return the HTML as a string
-            } else {
-                throw new Error('Unsupported content type: ' + contentType);
-            }
-        })
-        .then(data => {
-            if (typeof data === 'object') {
-                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-                saveHistory(url, method, headers, options.body, data);
-            } else {
-                document.getElementById('response').innerHTML = data; // Insert HTML into 'response' container
-                saveHistory(url, method, headers, options.body, data);
-            }
-        })
-        .catch(error => {
-            document.getElementById('response').textContent = `Error: ${error.message}`;
-        })
-        .finally(() => {
-            document.getElementById('loading-icon').style.display = 'none';
-        });
+        if (typeof data === 'object') {
+            responseContainer.textContent = JSON.stringify(data, null, 2);
+            saveHistory(url, method, headers, options.body, data);
+        } else {
+            // If the data is not an object, render it in an iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '500px'; // Adjust height as needed
+            
+            // Set the raw HTML response directly to the iframe
+            iframe.srcdoc = data; // Use the raw HTML data directly
+            
+            responseContainer.appendChild(iframe); // Append iframe to the response container
+        }
+    })
+    .catch(error => {
+        // Clear the response container and display the error as plain text
+        document.getElementById('response').textContent = `Error: ${error.message}`;
+    })
+    .finally(() => {
+        document.getElementById('loading-icon').style.display = 'none';
+    });
+
+
+
 }
+
+
+// Function to sanitize and remove <script> and <style> tags
+function sanitizeHTML(html) {
+    // Create a DOMParser to parse the HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Remove <script> tags
+    const scripts = doc.querySelectorAll('script');
+    scripts.forEach(script => script.remove());
+
+    // Remove <style> tags
+    const styles = doc.querySelectorAll('style');
+    styles.forEach(style => style.remove());
+
+    //Remove button 
+    const btn = doc.querySelectorAll('button');
+    btn.forEach(bt => bt.remove());
+
+    // Return the sanitized HTML as text (without the <script> and <style> tags)
+    return doc.body.innerHTML;
+}
+
 
 
 function getHeaders() {
