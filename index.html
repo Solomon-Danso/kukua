@@ -61,8 +61,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>KUKUA</h1>
-        
+        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+
+            <h1>KUKUA</h1>
+
+            <button id="reload-page" onclick="reloadPage()">Reload Page</button>
+    
+
+        </div>
+                
         <div class="api-section">
             <label for="api-url">API URL:</label>
             <input type="text" id="api-url" placeholder="Enter API URL">
@@ -124,5 +131,11 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // JavaScript function to reload the page
+        function reloadPage() {
+            location.reload();
+        }
+    </script>
 </body>
 </html>
