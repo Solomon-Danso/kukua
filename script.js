@@ -132,7 +132,7 @@ function sendRequest() {
             if (jsonBody) {
                 try {
                     options.body = JSON.stringify(JSON.parse(jsonBody));
-                    options.headers['Content-Type'] = 'application/json';
+                    options.headers['Content-Type'] = 'application/json';  // Set content type for JSON
                 } catch (error) {
                     alert('Invalid JSON body: ' + error.message);
                     document.getElementById('loading-icon').style.display = 'none';
@@ -141,6 +141,8 @@ function sendRequest() {
             }
         } else if (bodyType === 'form-data') {
             options.body = getFormData('body-section');
+            // Do NOT set 'Content-Type' header here. Let the browser handle it.
+            delete options.headers['Content-Type']; // Ensure no manual content type for form-data
         }
     }
 
@@ -152,6 +154,8 @@ function sendRequest() {
             return response.json();
         } else if (contentType && contentType.includes('text/html')) {
             return response.text(); // Return the HTML as a string
+        } else if (contentType && contentType.includes('text/plain')) {
+            return response.text(); // Handle plain text responses
         } else {
             throw new Error('Unsupported content type: ' + contentType);
         }
@@ -183,10 +187,8 @@ function sendRequest() {
     .finally(() => {
         document.getElementById('loading-icon').style.display = 'none';
     });
-
-
-
 }
+
 
 
 // Function to sanitize and remove <script> and <style> tags
