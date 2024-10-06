@@ -1,3 +1,19 @@
+
+Steps to run Kukua Directly 
+## Step 1:
+git clone https://github.com/Solomon-Danso/kukua.git
+
+## Step 2:
+cd kukua
+yarn install
+
+## Step 3:
+yarn start
+
+
+
+
+
 Steps to convert create a desktop app (MacOS)
 ## Step 1:
 npm install
