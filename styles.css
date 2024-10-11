@@ -6,7 +6,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    width: 98%;
     margin: 0 auto;
     background: #fff;
     padding: 20px;
@@ -108,4 +108,49 @@ pre {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+/* File Preview Container Styling */
+.file-preview-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.file-preview-container h3 {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.file-preview {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: auto;
+    max-height: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.file-preview iframe {
+    width: 100%;
+    height: 300px;
+    border: none;
+}
+
+
 

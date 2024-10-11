@@ -72,6 +72,10 @@ function createFormDataRow() {
         fileInput.style.display = fileInput.style.display === 'none' ? 'inline-block' : 'none';
     });
 
+    fileInput.addEventListener('change', (e) => {
+        previewFile(e.target.files[0]);
+    });
+
     const removeButton = document.createElement('button');
     removeButton.className = 'remove-row';
     removeButton.textContent = '-';
@@ -318,3 +322,71 @@ function deleteHistory(index) {
 
 // Initial display of history
 displayHistory();
+
+
+function previewFile(file) {
+    const filePreviewSection = document.getElementById('file-preview-container');
+    const filePreview = document.getElementById('file-preview');
+    const fileTitle = document.getElementById('fileTitle');
+    fileTitle.innerHTML = file.name.toLowerCase();
+    filePreview.innerHTML = ''; // Clear previous preview
+
+    if (file) {
+        filePreviewSection.style.display = 'block';
+        const fileName = file.name.toLowerCase();
+        const fileExtension = fileName.split('.').pop();
+
+        // Preview based on file extension
+        if (['jpeg', 'jpg', 'png', 'webp', 'ico', 'icns'].includes(fileExtension)) {
+            // Display image preview
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            filePreview.appendChild(img);
+        } else if (['mp4', 'webm', 'ogg'].includes(fileExtension)) {
+            // Display video preview
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(file);
+            video.controls = true;
+            video.style.maxWidth = '100%';
+            filePreview.appendChild(video);
+        } else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) {
+            // Display audio preview
+            const audio = document.createElement('audio');
+            audio.src = URL.createObjectURL(file);
+            audio.controls = true;
+            filePreview.appendChild(audio);
+        } else if (['pdf', 'doc', 'docx', 'odt'].includes(fileExtension)) {
+            // Display document preview in iframe (PDF and similar)
+            const iframe = document.createElement('iframe');
+            iframe.src = URL.createObjectURL(file);
+            iframe.style.width = '100%';
+            iframe.style.height = '500px';
+            iframe.style.border = 'none';
+            filePreview.appendChild(iframe);
+        } else if (file.type === 'text/plain') {
+            // Display plain text file
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const textContent = document.createElement('pre');
+                textContent.textContent = e.target.result;
+                filePreview.appendChild(textContent);
+            };
+            reader.readAsText(file);
+        } else {
+            // Unsupported file type
+            const message = document.createElement('p');
+            message.textContent = 'File preview not available for this file type.';
+            filePreview.appendChild(message);
+        }
+    } else {
+        filePreviewSection.style.display = 'none';
+    }
+}
+
+
+
+
+
+
